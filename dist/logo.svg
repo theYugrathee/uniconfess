@@ -1,0 +1,35 @@
+<svg width="512" height="512" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="appLogoGradientManual" x1="0" y1="0" x2="100" y2="100">
+            <stop stop-color="#FF4500" />
+            <stop offset="1" stop-color="#FFA500" />
+        </linearGradient>
+    </defs>
+    
+    <g>
+        <path 
+            d="M50 20L85 35L50 50L15 35L50 20Z" 
+            fill="url(#appLogoGradientManual)" 
+        />
+        <path 
+            d="M25 40V55C25 55 35 65 50 65C65 65 75 55 75 55V40" 
+            stroke="url(#appLogoGradientManual)" 
+            stroke-width="6" 
+            stroke-linecap="round" 
+            fill="none" 
+        />
+        <path 
+            d="M85 35V52" 
+            stroke="#FF4500" 
+            stroke-width="3" 
+            stroke-linecap="round"
+        />
+        <circle cx="85" cy="52" r="4" fill="#FF4500" />
+        
+        <path 
+            d="M50 28L72 38L50 48L28 38L50 28Z" 
+            fill="white" 
+            fill-opacity="0.2"
+        />
+    </g>
+</svg>

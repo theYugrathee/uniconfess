@@ -1,0 +1,5 @@
+{
+  "status": 404,
+  "statusText": "Not Found",
+  "body": "{\"code\":\"42883\",\"details\":null,\"hint\":\"No function matches the given name and argument types. You might need to add explicit type casts.\",\"message\":\"function net.http_post(url => unknown, headers => unknown, body => text) does not exist\"}"
+}

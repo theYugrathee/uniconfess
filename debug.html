@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confession Admin Debugger</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; }
+        .confession-item { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; }
+        .confession-item:last-child { border-bottom: none; }
+        .confession-item p { margin: 0; padding-right: 15px; }
+        button.delete-btn { background: #ff4d4d; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+        button.delete-btn:hover { background: #ff3333; }
+        .auth-box { background: #eef; padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
+
+    <!-- Firebase SDK v8 Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h2>Confession Admin Debugger</h2>
+    
+    <div class="auth-box" id="authBox">
+        <h3>Login as Admin</h3>
+        <input type="email" id="email" placeholder="admin@yug.com" value="admin@yug.com">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()" style="padding: 8px;">Login</button>
+    </div>
+
+    <div id="status" style="margin-bottom: 10px; font-weight: bold; color: #666;">Not logged in</div>
+    <div id="confessionList">Loading confessions...</div>
+</div>
+
+<script>
+  // 1. Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyBuu6ziYQMFENY8XUGjSbe39hYDJmQl8cc",
+    authDomain: "campus-confession-3f696.firebaseapp.com",
+    databaseURL: "https://campus-confession-3f696-default-rtdb.firebaseio.com",
+    projectId: "campus-confession-3f696",
+    storageBucket: "campus-confession-3f696.firebasestorage.app",
+    messagingSenderId: "137080487648",
+    appId: "1:137080487648:web:f5ca9d910bcfd983c41a85"
+  };
+
+  // 2. Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const auth = firebase.auth();
+
+  // Auth Listener
+  auth.onAuthStateChanged(user => {
+      if (user) {
+          document.getElementById('status').innerText = `Logged in as: ${user.email} (${user.uid})`;
+          document.getElementById('authBox').style.display = 'none';
+          loadConfessions();
+      } else {
+          document.getElementById('status').innerText = "Not logged in";
+          document.getElementById('confessionList').innerHTML = "Please login to view data.";
+      }
+  });
+
+  function login() {
+      const e = document.getElementById('email').value;
+      const p = document.getElementById('password').value;
+      auth.signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
+  }
+
+  // 3. Delete Function (Exact Logic Requested)
+  function deleteConfession(confessionId) {
+    if(!confirm("Are you sure you want to delete this item?")) return;
+    
+    firebase.database().ref("confessions/" + confessionId).remove()
+      .then(() => {
+        console.log("CONFESSION DELETED SUCCESSFULLY ✔");
+        // alert("Deleted successfully"); 
+        // Commented out alert to be less annoying, handled by UI refresh
+        loadConfessions(); // refresh list after delete
+      })
+      .catch((error) => {
+        console.error("DELETE ERROR ❌:", error);
+        alert("Delete failed: " + error.message);
+      });
+  }
+
+  // 4. Fetch Function (Exact Logic Requested)
+  function loadConfessions() {
+    firebase.database().ref("confessions").once("value", (snapshot) => {
+      const data = snapshot.val();
+      const list = document.getElementById("confessionList");
+      list.innerHTML = "";
+
+      if (!data) {
+        list.innerHTML = "<p>No confessions found.</p>";
+        return;
+      }
+
+      Object.keys(data).forEach((key) => {
+        const item = document.createElement("div");
+        item.className = "confession-item";
+        // Use 'content' instead of 'text' based on your schema, falling back to text if needed
+        const textContent = data[key].content || data[key].text || "No Content";
+        const userDisplay = data[key].username || "Anon";
+        
+        item.innerHTML = `
+          <div>
+              <strong>${userDisplay}</strong>
+              <p>${textContent}</p>
+              <small style='color:#888'>ID: ${key}</small>
+          </div>
+          <button class="delete-btn" onclick="deleteConfession('${key}')">Delete</button>
+        `;
+        list.appendChild(item);
+      });
+    });
+  }
+</script>
+
+</body>
+</html>
